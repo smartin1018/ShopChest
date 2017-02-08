@@ -14,6 +14,7 @@ import de.epiceric.shopchest.utils.Permissions;
 import de.epiceric.shopchest.utils.ShopUtils;
 import de.epiceric.shopchest.worldguard.ShopFlag;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -55,13 +56,9 @@ public class ChestProtectListener implements Listener {
             Bukkit.getScheduler().runTaskLater(plugin, new Runnable() {
                 @Override
                 public void run() {
-                    Shop newShop = null;
-
-                    if (b.getLocation().equals(l.getLocation()))
-                        newShop = new Shop(shop.getID(), plugin, shop.getVendor(), shop.getProduct(), r.getLocation(), shop.getBuyPrice(), shop.getSellPrice(), shop.getShopType());
-                    else if (b.getLocation().equals(r.getLocation()))
-                        newShop = new Shop(shop.getID(), plugin, shop.getVendor(), shop.getProduct(), l.getLocation(), shop.getBuyPrice(), shop.getSellPrice(), shop.getShopType());
-
+                    Location loc = (b.getLocation().equals(l.getLocation()) ? r.getLocation() : l.getLocation());
+                    Shop newShop = new Shop(shop.getID(), plugin, shop.getVendor(), shop.getProduct(), loc, shop.getBuyPrice(), shop.getSellPrice(), shop.getShopType());
+                    newShop.create();
                     shopUtils.addShop(newShop, true);
                 }
             }, 1L);
@@ -163,6 +160,7 @@ public class ChestProtectListener implements Listener {
                             if (b.getRelative(BlockFace.UP).getType() == Material.AIR) {
                                 shopUtils.removeShop(shop, true);
                                 Shop newShop = new Shop(shop.getID(), ShopChest.getInstance(), shop.getVendor(), shop.getProduct(), shop.getLocation(), shop.getBuyPrice(), shop.getSellPrice(), shop.getShopType());
+                                newShop.create();
                                 shopUtils.addShop(newShop, true);
                                 plugin.debug(String.format("%s extended %s's shop (#%d)", p.getName(), shop.getVendor().getName(), shop.getID()));
                             } else {
